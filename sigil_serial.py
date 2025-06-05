@@ -50,8 +50,8 @@ def number_to_position(number):
 def add_circle_gcode(x, y, radius=3):
     """Approximate a small circle using short movements (GRBL-safe)"""
     circle_commands = [
-        f"G0 X{x:.2f} Y{y:.2f} Z5",
-        f"G1 X{x+radius:.2f} Y{y:.2f} F500",
+        f"G0 X{x:.2f} Y{y:.2f} Z0",
+        f"G1 X{x+radius:.2f} Y{y:.2f} Z5 F500",
         f"G1 X{x:.2f} Y{y+radius:.2f} F500",
         f"G1 X{x-radius:.2f} Y{y:.2f} F500",
         f"G1 X{x:.2f} Y{y-radius:.2f} F500",
@@ -61,7 +61,7 @@ def add_circle_gcode(x, y, radius=3):
 
 def sigil_to_gcode(numbers):
     """Generate full G-code for GRBL"""
-    gcode = ["G90 ; Absolute positioning", "G21 ; Use millimeters", "G0 Z5 ; Lift tool"]
+    gcode = ["G90 ; Absolute positioning", "G21 ; Use millimeters", "G0 Z0 ; Lift tool","M5;"]
 
     positions = [number_to_position(num) for num in numbers if number_to_position(num)]
     
@@ -76,7 +76,7 @@ def sigil_to_gcode(numbers):
         end_x, end_y = positions[-1]
         gcode.append(f"G1 X{end_x+10:.2f} Y{end_y:.2f} F500")  # Exit line
 
-    gcode.extend(["G0 Z5 ; Lift tool", "M5 ; Stop tool"])
+    gcode.extend([ "G0 Z0;","M5 ; Stop tool", "G0 X0 Y0 Z0"])
     return "\n".join(gcode)
 
 def send_gcode_to_serial(gcode, port="COM10", baudrate=115200):
